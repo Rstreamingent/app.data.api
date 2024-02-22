@@ -31,7 +31,7 @@ app.get('/', async (req, res) => {
 
     res.json(allData);
   } finally {
-    await client.close();
+    await setTimeout(() => {client.close()}, 1500)
     console.log('Connection closed');
   }
 });
