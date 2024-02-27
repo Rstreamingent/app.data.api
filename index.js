@@ -1,8 +1,10 @@
 const express = require('express');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const app = express();
+var cors = require('cors')
 const port = process.env.PORT || 3000;
 
+app.use(cors());
 const uri = "mongodb+srv://rstreamingentertainment:RSTREAMING%401234@cluster0.lqhakio.mongodb.net/?retryWrites=true&w=majority";
 
 const client = new MongoClient(uri, {
