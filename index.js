@@ -16,43 +16,58 @@ const client = new MongoClient(uri, {
   },
 });
 
-app.get('/', async (req, res) => {
-  try {
-    await client.connect();
+// Connect to MongoDB before starting the server
+client.connect()
+  .then(() => {
     console.log('Connected to the database');
-    const database = client.db('movies');
-    const collections = await database.listCollections().toArray();
 
-    const responseData = [];
+    app.get('/', async (req, res) => {
+      try {
+        const database = client.db('movies');
+        const collections = await database.listCollections().toArray();
 
-    // Define the custom order for each collection
-    const collectionOrder = {
-      'featurefilms': 1,
-      'Documentory': 2,
-      'shortfilms':3
-      // Add more collections and their orders as needed
-    };
+        const responseData = [];
 
-    for (const collection of collections) {
-      const collectionName = collection.name;
-      const collectionData = await database.collection(collectionName).find().toArray();
-      responseData.push({ collectionName, collectionData });
-    }
+        // Define the custom order for each collection
+        const collectionOrder = {
+          'featurefilms': 1,
+          'Documentory': 2,
+          'shortfilms': 3
+          // Add more collections and their orders as needed
+        };
 
-    // Sort the response based on the specified order or place unspecified ones at the end
-    const sortedResponse = responseData.sort((a, b) => {
-      const orderA = collectionOrder[a.collectionName] || Number.MAX_SAFE_INTEGER;
-      const orderB = collectionOrder[b.collectionName] || Number.MAX_SAFE_INTEGER;
-      return orderA - orderB;
+        for (const collection of collections) {
+          const collectionName = collection.name;
+          const collectionData = await database.collection(collectionName).find().toArray();
+          responseData.push({ collectionName, collectionData });
+        }
+
+        // Sort the response based on the specified order or place unspecified ones at the end
+        const sortedResponse = responseData.sort((a, b) => {
+          const orderA = collectionOrder[a.collectionName] || Number.MAX_SAFE_INTEGER;
+          const orderB = collectionOrder[b.collectionName] || Number.MAX_SAFE_INTEGER;
+          return orderA - orderB;
+        });
+
+        res.json(sortedResponse);
+      } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
     });
 
-    res.json(sortedResponse);
-  } finally {
-    await client.close();
-    console.log('Connection closed');
-  }
-});
+    app.listen(port, () => {
+      console.log(`Connected at http://localhost:${port}`);
+    });
+  })
+  .catch((error) => {
+    console.error('MongoDB connection error:', error.message);
+    process.exit(1); // Terminate the application on connection error
+  });
 
-app.listen(port, () => {
-  console.log(`Connected at http://localhost:${port}`);
+// Gracefully handle process termination
+process.on('SIGINT', () => {
+  console.log('Closing MongoDB connection on application termination');
+  client.close();
+  process.exit(0);
 });
