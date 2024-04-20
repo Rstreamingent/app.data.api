@@ -3,7 +3,13 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
-app.use(cors());
+const cors = require('cors');
+const corsOptions ={
+    origin:'https://rstreamingent.in/', 
+    credentials:true,            //access-control-allow-credentials:true
+    optionSuccessStatus:200
+}
+app.use(cors(corsOptions));
 
 const uri =
   'mongodb+srv://rstreamingentertainment:RSTREAMING%401234@cluster0.lqhakio.mongodb.net/?retryWrites=true&w=majority';
