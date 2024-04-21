@@ -1,6 +1,7 @@
-const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const cors = require('cors');
+import express from 'express';
+import { MongoClient, ServerApiVersion } from 'mongodb';
+import cors from 'cors';
+import fetch from 'node-fetch';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -8,7 +9,8 @@ const port = process.env.PORT || 3000;
 const corsOptions = {
     origin: '*', // Allow requests from all origins
     credentials: true,
-    optionSuccessStatus: 200
+    optionSuccessStatus: 200,
+    methods: ['GET', 'POST'] // Allow GET and POST methods
 }
 
 app.use(cors(corsOptions));
