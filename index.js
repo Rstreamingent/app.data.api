@@ -13,8 +13,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-const uri =
-    'mongodb+srv://rstreamingentertainment:RSTREAMING%401234@cluster0.lqhakio.mongodb.net/?retryWrites=true&w=majority';
+const uri = 'mongodb+srv://rstreamingentertainment:RSTREAMING%401234@cluster0.lqhakio.mongodb.net/?retryWrites=true&w=majority';
 
 const client = new MongoClient(uri, {
     serverApi: {
@@ -23,6 +22,12 @@ const client = new MongoClient(uri, {
         deprecationErrors: true,
     },
 });
+
+async function getUrl(url) {
+    let response = await fetch(url);
+    let jsonData = await response.json();
+    return jsonData;
+}
 
 // Connect to MongoDB before starting the server
 client.connect()
@@ -69,20 +74,22 @@ client.connect()
             try {
                 const imageURL = req.query.url; // Assuming the URL is passed as a query parameter
 
-                // Fetch the image from the original URL using dynamic import
-                const fetch = await import('node-fetch');
-                const response = await fetch.default(imageURL);
-                const contentType = response.headers.get('content-type');
+                // Fetch the image from the original URL
+                const response = await fetch(imageURL);
 
-                // Check if the response is successful and content-type is an image
-                if (response.ok && contentType && contentType.startsWith('image')) {
+                // Set CORS headers for this endpoint
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                res.setHeader('Access-Control-Allow-Methods', 'GET');
+
+                // Check if the response is successful
+                if (response.ok) {
+                    const contentType = response.headers.get('content-type');
                     // Set the appropriate content-type header for the image
                     res.setHeader('Content-Type', contentType);
-
                     // Pipe the image data from the fetched response to the response of your server
                     response.body.pipe(res);
                 } else {
-                    // If the response is not successful or content-type is not an image, return an error
+                    // If the response is not successful, return an error
                     res.status(response.status).send('Failed to fetch image');
                 }
             } catch (error) {
