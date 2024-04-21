@@ -1,7 +1,6 @@
 const express = require('express');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const cors = require('cors');
-const fetch = require('node-fetch');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -70,8 +69,9 @@ client.connect()
             try {
                 const imageURL = req.query.url; // Assuming the URL is passed as a query parameter
 
-                // Fetch the image from the original URL
-                const response = await fetch(imageURL);
+                // Fetch the image from the original URL using dynamic import
+                const fetch = await import('node-fetch');
+                const response = await fetch.default(imageURL);
                 const contentType = response.headers.get('content-type');
 
                 // Check if the response is successful and content-type is an image
