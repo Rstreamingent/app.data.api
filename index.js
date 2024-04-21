@@ -2,12 +2,12 @@ const express = require('express');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const cors = require('cors');
 const app = express();
-const port = process.env.PORT || 3000;
-const corsOptions ={
-    origin:'*', 
-    credentials:true,            //access-control-allow-credentials:true
+const port = process.env.PORT || 3000;const corsOptions ={
+    origin:'*', // Allow requests from all origins
+    credentials:true,
     optionSuccessStatus:200
 }
+
 app.use(cors(corsOptions));
 
 const uri =
