@@ -1,6 +1,5 @@
 const express = require('express');
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const fetch = require('node-fetch'); // Import fetch module for Node.js environment
 const cors = require('cors');
 
 const app = express();
