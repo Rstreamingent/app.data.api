@@ -5,17 +5,14 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// const corsOptions = {
-//     origin: "https://rstreamingent.in", // Allow requests from all origins
-//     credentials: true,
-//     optionSuccessStatus: 200,
-//     methods: ['GET', 'POST'] // Allow GET and POST methods
-// }
-
+const corsOptions = {
+    origin: "[https://rstreamingent.in, "*"] , // Allow requests from all origins
+    credentials: true,
+    optionSuccessStatus: 200,
+    methods: ['GET', 'POST'] // Allow GET and POST methods
+}
 app.use(cors());
-
 const uri = 'mongodb+srv://rstreamingentertainment:RSTREAMING%401234@cluster0.lqhakio.mongodb.net/?retryWrites=true&w=majority';
-
 const client = new MongoClient(uri, {
     serverApi: {
         version: ServerApiVersion.v1,
@@ -23,7 +20,6 @@ const client = new MongoClient(uri, {
         deprecationErrors: true,
     },
 });
-
 // Function to fetch image from URL
 async function fetchImage(imageURL) {
     const response = await fetch(imageURL);
@@ -32,7 +28,6 @@ async function fetchImage(imageURL) {
     }
     return response;
 }
-
 // Connect to MongoDB before starting the server
 client.connect()
     .then(() => {
