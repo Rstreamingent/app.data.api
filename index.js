@@ -1,5 +1,6 @@
 const express = require('express');
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const fetch = require('node-fetch'); // Import fetch module for Node.js environment
 const cors = require('cors');
 
 const app = express();
@@ -24,10 +25,13 @@ const client = new MongoClient(uri, {
     },
 });
 
-async function getUrl(url) {
-    let response = await fetch(url);
-    let jsonData = await response.json();
-    return jsonData;
+// Function to fetch image from URL
+async function fetchImage(imageURL) {
+    const response = await fetch(imageURL);
+    if (!response.ok) {
+        throw new Error('Failed to fetch image');
+    }
+    return response;
 }
 
 // Connect to MongoDB before starting the server
@@ -76,23 +80,14 @@ client.connect()
                 const imageURL = req.query.url; // Assuming the URL is passed as a query parameter
 
                 // Fetch the image from the original URL
-                const response = await fetch(imageURL);
+                const imageResponse = await fetchImage(imageURL);
 
-                // Set CORS headers for this endpoint
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                res.setHeader('Access-Control-Allow-Methods', 'GET');
+                // Set the appropriate content-type header for the image
+                const contentType = imageResponse.headers.get('content-type');
+                res.setHeader('Content-Type', contentType);
 
-                // Check if the response is successful
-                if (response.ok) {
-                    const contentType = response.headers.get('content-type');
-                    // Set the appropriate content-type header for the image
-                    res.setHeader('Content-Type', contentType);
-                    // Pipe the image data from the fetched response to the response of your server
-                    response.body.pipe(res);
-                } else {
-                    // If the response is not successful, return an error
-                    res.status(response.status).send('Failed to fetch image');
-                }
+                // Stream the image data from the fetched response to the response of your server
+                imageResponse.body.pipe(res);
             } catch (error) {
                 console.error('Error fetching image:', error.message);
                 res.status(500).send('Internal Server Error');
