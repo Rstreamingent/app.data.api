@@ -5,14 +5,14 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
 
-const corsOptions = {
-    origin: "https://rstreamingent.in", // Allow requests from all origins
-    credentials: true,
-    optionSuccessStatus: 200,
-    methods: ['GET', 'POST'] // Allow GET and POST methods
-}
+// const corsOptions = {
+//     origin: "https://rstreamingent.in", // Allow requests from all origins
+//     credentials: true,
+//     optionSuccessStatus: 200,
+//     methods: ['GET', 'POST'] // Allow GET and POST methods
+// }
 
-app.use(cors(corsOptions));
+app.use(cors());
 
 const uri = 'mongodb+srv://rstreamingentertainment:RSTREAMING%401234@cluster0.lqhakio.mongodb.net/?retryWrites=true&w=majority';
 
