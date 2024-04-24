@@ -11,6 +11,15 @@ const corsOptions = {
     optionSuccessStatus: 200,
     methods: ['GET', 'POST'] // Allow GET and POST methods
 }
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
 app.use(cors());
 const uri = 'mongodb+srv://rstreamingentertainment:RSTREAMING%401234@cluster0.lqhakio.mongodb.net/?retryWrites=true&w=majority';
 const client = new MongoClient(uri, {
