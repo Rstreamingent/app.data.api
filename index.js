@@ -49,6 +49,12 @@ client.connect()
         console.log('Connected to the database');
 
         app.get('/', async (req, res) => {
+res.setHeader("Access-Control-Allow-Origin", "*")
+res.setHeader("Access-Control-Allow-Credentials", "true");
+res.setHeader("Access-Control-Max-Age", "1800");
+res.setHeader("Access-Control-Allow-Headers", "content-type");
+res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" ); 
+
             try {
                 const database = client.db('movies');
                 const collections = await database.listCollections().toArray();
