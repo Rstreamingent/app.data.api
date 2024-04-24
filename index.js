@@ -6,7 +6,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const corsOptions = {
-    origin: ["https://rstreamingent.in" ] , // Allow requests from all origins
+    origin: "https://rstreamingent.in"  , // Allow requests from all origins
     credentials: true,
     optionSuccessStatus: 200,
     methods: ['GET', 'POST'] // Allow GET and POST methods
