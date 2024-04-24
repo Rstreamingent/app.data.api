@@ -16,7 +16,6 @@ const uri = 'mongodb+srv://rstreamingentertainment:RSTREAMING%401234@cluster0.lq
 const client = new MongoClient(uri, {
     serverApi: {
         version: ServerApiVersion.v1,
-        strict: true,
         deprecationErrors: true,
     },
 });
