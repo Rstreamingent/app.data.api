@@ -1,26 +1,22 @@
 const express = require('express');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const cors = require('cors');
+const fetch = require('node-fetch'); // Ensure to install node-fetch
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+// CORS configuration
 const corsOptions = {
-    origin: '*' , // Allow requests from all origins
+    origin: '*',
     credentials: true,
-    optionSuccessStatus: 200,
-    methods: ['GET', 'POST'] // Allow GET and POST methods
-}
-
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  next();
-});
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
 
 app.use(cors(corsOptions));
+
+// MongoDB connection URI and client setup
 const uri = 'mongodb+srv://rstreamingentertainment:RSTREAMING%401234@cluster0.lqhakio.mongodb.net/?retryWrites=true&w=majority';
 const client = new MongoClient(uri, {
     serverApi: {
@@ -29,32 +25,12 @@ const client = new MongoClient(uri, {
     },
 });
 
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://rstreamingent.in/");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-
-// Function to fetch image from URL
-async function fetchImage(imageURL) {
-    const response = await fetch(imageURL);
-    if (!response.ok) {
-        throw new Error('Failed to fetch image');
-    }
-    return response;
-}
 // Connect to MongoDB before starting the server
 client.connect()
     .then(() => {
         console.log('Connected to the database');
 
         app.get('/', async (req, res) => {
-res.setHeader("Access-Control-Allow-Origin", "*")
-res.setHeader("Access-Control-Allow-Credentials", "true");
-res.setHeader("Access-Control-Max-Age", "1800");
-res.setHeader("Access-Control-Allow-Headers", "content-type");
-res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" ); 
-
             try {
                 const database = client.db('movies');
                 const collections = await database.listCollections().toArray();
@@ -66,7 +42,6 @@ res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, O
                     'featurefilms': 1,
                     'Documentory': 2,
                     'shortfilms': 3
-                    // Add more collections and their orders as needed
                 };
 
                 for (const collection of collections) {
@@ -95,7 +70,10 @@ res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, O
                 const imageURL = req.query.url; // Assuming the URL is passed as a query parameter
 
                 // Fetch the image from the original URL
-                const imageResponse = await fetchImage(imageURL);
+                const imageResponse = await fetch(imageURL);
+                if (!imageResponse.ok) {
+                    throw new Error('Failed to fetch image');
+                }
 
                 // Set the appropriate content-type header for the image
                 const contentType = imageResponse.headers.get('content-type');
