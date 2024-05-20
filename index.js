@@ -1,7 +1,7 @@
 const express = require('express');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const cors = require('cors');
-const fetch = require('node-fetch'); // Ensure to install node-fetch
+const https = require('https');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -24,6 +24,20 @@ const client = new MongoClient(uri, {
         deprecationErrors: true,
     },
 });
+
+// Function to fetch image from URL using https module
+function fetchImage(imageURL) {
+    return new Promise((resolve, reject) => {
+        https.get(imageURL, (response) => {
+            if (response.statusCode !== 200) {
+                return reject(new Error('Failed to fetch image'));
+            }
+            resolve(response);
+        }).on('error', (err) => {
+            reject(err);
+        });
+    });
+}
 
 // Connect to MongoDB before starting the server
 client.connect()
@@ -70,17 +84,14 @@ client.connect()
                 const imageURL = req.query.url; // Assuming the URL is passed as a query parameter
 
                 // Fetch the image from the original URL
-                const imageResponse = await fetch(imageURL);
-                if (!imageResponse.ok) {
-                    throw new Error('Failed to fetch image');
-                }
+                const imageResponse = await fetchImage(imageURL);
 
                 // Set the appropriate content-type header for the image
-                const contentType = imageResponse.headers.get('content-type');
+                const contentType = imageResponse.headers['content-type'];
                 res.setHeader('Content-Type', contentType);
 
                 // Stream the image data from the fetched response to the response of your server
-                imageResponse.body.pipe(res);
+                imageResponse.pipe(res);
             } catch (error) {
                 console.error('Error fetching image:', error.message);
                 res.status(500).send('Internal Server Error');
